@@ -1,11 +1,22 @@
-import Link from "next/link";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Home, Utensils, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export function MobileMenu() {
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
+
+  const handleNavigation = (href: string) => {
+    setOpen(false);
+    router.push(href);
+  };
+
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button size="icon" variant="outline" className="sm:hidden">
           <Menu className="h-5 w-5" />
@@ -14,23 +25,23 @@ export function MobileMenu() {
       </SheetTrigger>
       <SheetContent side="left" className="sm:max-w-xs">
         <nav className="grid gap-6 text-lg font-medium">
-          <Link href="#" className="">
-            <span>SF Food Truck Finder</span>
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-4 px-2.5 text-foreground"
+          <span>SF Food Truck Finder</span>
+          <Button
+            variant="ghost"
+            className="flex items-center justify-start gap-4 px-2.5 text-foreground"
+            onClick={() => handleNavigation("/")}
           >
             <Home className="h-5 w-5" />
             Home
-          </Link>
-          <Link
-            href="#"
-            className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+          </Button>
+          <Button
+            variant="ghost"
+            className="flex items-center justify-start gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+            onClick={() => handleNavigation("/food-trucks")}
           >
             <Utensils className="h-5 w-5" />
             Food Trucks
-          </Link>
+          </Button>
         </nav>
       </SheetContent>
     </Sheet>
