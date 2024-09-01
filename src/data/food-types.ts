@@ -4,7 +4,6 @@ export const foodTypes: string[] = [
   "Breakfast",
   "Burgers",
   "Burritos",
-  "Caribbean",
   "Coffee",
   "Cold Truck",
   "Desserts",

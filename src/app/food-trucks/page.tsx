@@ -1,4 +1,5 @@
 import { FoodTruckTable } from "@/components/FoodTruckTable";
+import { FoodTypeSelect } from "@/components/FoodTypeSelect";
 import {
   Card,
   CardContent,
@@ -7,8 +8,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getFoodTruckData } from "@/utils/getFoodTruckData";
+import { FilterFoodTrucks } from "@/utils/filterFoodTrucks";
 
-export default function Page() {
+export const dynamic = "force-dynamic";
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  const foodType = searchParams.foodType as string | undefined;
+
+  const allFoodTrucks = await getFoodTruckData();
+
+  const filterFoodTrucks = new FilterFoodTrucks(allFoodTrucks);
+
+  const { filteredFoodTrucks, error } = filterFoodTrucks.filterByFoodType(
+    foodType ? [foodType] : null
+  );
+
   return (
     <Card>
       <CardHeader>
@@ -18,11 +37,19 @@ export default function Page() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <FoodTruckTable />
+        <div className="mb-4">
+          <FoodTypeSelect selectedFoodType={foodType || null} />
+        </div>
+        {error ? (
+          <div>{error}</div>
+        ) : (
+          <FoodTruckTable foodTrucks={filteredFoodTrucks} />
+        )}
       </CardContent>
       <CardFooter>
         <div className="text-xs text-muted-foreground">
-          Showing <strong>1-10</strong> of <strong>50</strong> food trucks
+          Showing <strong>{filteredFoodTrucks.length}</strong> of{" "}
+          <strong>{allFoodTrucks.length}</strong> food trucks
         </div>
       </CardFooter>
     </Card>
