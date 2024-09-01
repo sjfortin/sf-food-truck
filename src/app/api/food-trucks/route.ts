@@ -1,19 +1,36 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest } from "next/server";
 import { getFoodTruckData } from "@/utils/getFoodTruckData";
-// import { FoodTruck } from "@/types";
+import { FilterFoodTrucks } from "@/utils/filterFoodTrucks";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const foodTrucks = await getFoodTruckData();
-    console.log({ foodTrucks });
-    return new Response(JSON.stringify(foodTrucks), {
+    const { searchParams } = new URL(request.url);
+    const foodType = searchParams.get("foodType");
+
+    const allFoodTrucks = await getFoodTruckData();
+    const filterFoodTrucks = new FilterFoodTrucks(allFoodTrucks);
+    const { filteredFoodTrucks, error } =
+      filterFoodTrucks.filterByFoodType(foodType);
+
+    if (error) {
+      return new Response(JSON.stringify({ error }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify(filteredFoodTrucks), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: "Error parsing CSV file" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    console.error("Error fetching or filtering food trucks:", error);
+    return new Response(
+      JSON.stringify({ error: "Error processing food truck data" }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 }
