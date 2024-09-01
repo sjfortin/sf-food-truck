@@ -6,8 +6,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { FoodTruck } from "@/data/food-truck";
 
-export function FoodTruckTable() {
+interface FoodTruckTableProps {
+  foodTrucks: FoodTruck[];
+}
+
+export function FoodTruckTable({ foodTrucks }: FoodTruckTableProps) {
   return (
     <Table>
       <TableHeader>
@@ -18,13 +23,15 @@ export function FoodTruckTable() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableRow>
-          <TableCell className="font-medium">Taco Truck Deluxe</TableCell>
-          <TableCell>Mexican</TableCell>
-          <TableCell className="hidden md:table-cell">
-            Mission District
-          </TableCell>
-        </TableRow>
+        {foodTrucks.map((truck) => (
+          <TableRow key={truck.locationid}>
+            <TableCell className="font-medium">{truck.Applicant}</TableCell>
+            <TableCell>{truck.FoodItems}</TableCell>
+            <TableCell className="hidden md:table-cell">
+              {truck.LocationDescription}
+            </TableCell>
+          </TableRow>
+        ))}
       </TableBody>
     </Table>
   );

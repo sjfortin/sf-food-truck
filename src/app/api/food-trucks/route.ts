@@ -5,12 +5,14 @@ import { FilterFoodTrucks } from "@/utils/filterFoodTrucks";
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const foodType = searchParams.get("foodType");
+    const foodTypes = searchParams.getAll("foodType");
 
     const allFoodTrucks = await getFoodTruckData();
+
     const filterFoodTrucks = new FilterFoodTrucks(allFoodTrucks);
+    
     const { filteredFoodTrucks, error } =
-      filterFoodTrucks.filterByFoodType(foodType);
+      filterFoodTrucks.filterByFoodType(foodTypes);
 
     if (error) {
       return new Response(JSON.stringify({ error }), {

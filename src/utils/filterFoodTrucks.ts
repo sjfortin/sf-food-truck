@@ -1,5 +1,9 @@
 import { FoodTruck } from "@/data/food-truck";
-import { foodTypes } from "@/data/food-types";
+
+interface FilterResult {
+  filteredFoodTrucks: FoodTruck[];
+  error: string | null;
+}
 
 export class FilterFoodTrucks {
   private foodTrucks: FoodTruck[];
@@ -8,29 +12,26 @@ export class FilterFoodTrucks {
     this.foodTrucks = foodTrucks;
   }
 
-  filterByFoodType(foodType: string | null) {
-    if (foodType) {
-      const normalizedFoodType = foodType.toLowerCase();
-      const normalizedFoodTypes = foodTypes.map((type) => type.toLowerCase());
+  filterByFoodType(foodTypes: string[] | null): FilterResult {
+    if (!foodTypes || foodTypes.length === 0) {
+      return { filteredFoodTrucks: this.foodTrucks, error: null };
+    }
 
-      if (normalizedFoodTypes.includes(normalizedFoodType)) {
-        return {
-          filteredFoodTrucks: this.foodTrucks.filter((truck) =>
-            truck.FoodItems.toLowerCase().includes(normalizedFoodType)
-          ),
-          error: null,
-        };
-      } else {
-        return {
-          filteredFoodTrucks: [],
-          error: `No food trucks found for the specified food type: ${foodType}`,
-        };
-      }
-    } else {
+    const filteredTrucks = this.foodTrucks.filter((truck) =>
+      foodTypes.some((type) =>
+        truck.FoodItems.toLowerCase().includes(type.toLowerCase())
+      )
+    );
+
+    if (filteredTrucks.length === 0) {
       return {
-        filteredFoodTrucks: this.foodTrucks,
-        error: null,
+        filteredFoodTrucks: [],
+        error: `No food trucks found for the specified food types: ${foodTypes.join(
+          ", "
+        )}`,
       };
     }
+
+    return { filteredFoodTrucks: filteredTrucks, error: null };
   }
 }

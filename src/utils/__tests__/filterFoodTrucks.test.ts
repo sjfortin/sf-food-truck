@@ -62,31 +62,45 @@ describe("FilterFoodTrucks", () => {
   });
 
   it("should filter food trucks by food type correctly", () => {
-    const result = filterFoodTrucks.filterByFoodType("Tacos");
+    const result = filterFoodTrucks.filterByFoodType(["Tacos"]);
     expect(result.filteredFoodTrucks).toHaveLength(1);
     expect(result.filteredFoodTrucks[0].Applicant).toBe("Taco Truck");
     expect(result.error).toBeNull();
   });
 
   it("should be case-insensitive when filtering", () => {
-    const result = filterFoodTrucks.filterByFoodType("pizza");
+    const result = filterFoodTrucks.filterByFoodType(["pizza"]);
     expect(result.filteredFoodTrucks).toHaveLength(1);
     expect(result.filteredFoodTrucks[0].Applicant).toBe("Pizza Van");
     expect(result.error).toBeNull();
   });
 
   it("should return an empty array and error message for non-existent food type", () => {
-    const result = filterFoodTrucks.filterByFoodType("Sushi");
+    const result = filterFoodTrucks.filterByFoodType(["Sushi"]);
     expect(result.filteredFoodTrucks).toHaveLength(0);
     expect(result.error).toBe(
-      "No food trucks found for the specified food type: Sushi"
+      "No food trucks found for the specified food types: Sushi"
     );
   });
 
   it("should handle partial matches in food items", () => {
-    const result = filterFoodTrucks.filterByFoodType("Burritos");
+    const result = filterFoodTrucks.filterByFoodType(["Burritos"]);
     expect(result.filteredFoodTrucks).toHaveLength(1);
     expect(result.filteredFoodTrucks[0].Applicant).toBe("Taco Truck");
+    expect(result.error).toBeNull();
+  });
+
+  it("should filter food trucks by multiple food types", () => {
+    const result = filterFoodTrucks.filterByFoodType(["Tacos", "Pizza"]);
+    expect(result.filteredFoodTrucks).toHaveLength(2);
+    expect(result.filteredFoodTrucks[0].Applicant).toBe("Taco Truck");
+    expect(result.filteredFoodTrucks[1].Applicant).toBe("Pizza Van");
+    expect(result.error).toBeNull();
+  });
+
+  it("should return all trucks if an empty array is provided", () => {
+    const result = filterFoodTrucks.filterByFoodType([]);
+    expect(result.filteredFoodTrucks).toEqual(mockFoodTrucks);
     expect(result.error).toBeNull();
   });
 });
