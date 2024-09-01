@@ -1,5 +1,5 @@
 import Papa from "papaparse";
-import { FoodTruck } from "@/types";
+import { FoodTruck } from "@/data/food-truck";
 
 export async function getFoodTruckData(): Promise<FoodTruck[]> {
   const url = "https://data.sfgov.org/api/views/rqzj-sfat/rows.csv";

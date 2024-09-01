@@ -6,7 +6,7 @@ Develop a web application that allows users to find food trucks in San Francisco
 
 ## Getting Started
 
-This is a [Next.js App Router build](https://nextjs.org/docs/app). 
+This is a [Next.js App Router build](https://nextjs.org/docs/app).
 
 ## Deployment
 
@@ -14,3 +14,38 @@ The app is deployed on Vercel and can be accessed at [https://sf-food-truck.samf
 
 The staging site can be accessed at [https://sf-food-truck-staging.samfort.in/](https://sf-food-truck-staging.samfort.in/). The staging site is deployed automatically when a PR is merged into the `develop` branch.
 
+## Testing
+
+This app is setup to run Jest tests. To run the tests, run the following command:
+
+```bash
+npm run test
+```
+
+The Jest extension https://marketplace.cursorapi.com/items?itemName=Orta.vscode-jest is recommended for assistance with running tests.
+
+## Debugging
+
+You can debug the app by running the following command by makig sure the .vscode/launch.json file is set up correctly. In VSCode, you can run the Debugger by clicking the debug button in the sidebar, selecting one of the debug options, and then clicking the green play button.
+
+## Linting
+
+This app is setup to run ESLint. To run the linter, run the following command:
+
+```bash
+npm run lint
+```
+
+## API
+
+### Get Food Truck Data
+
+`/api/food-trucks`
+
+Returns a list of all food trucks.
+
+### Get Food Truck Data by Food Type
+
+`/api/food-trucks?foodType=pizza`
+
+Include a `foodType` query parameter to filter the food trucks by food type. See `/src/data/food-types.ts` for a list of valid food types.
