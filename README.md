@@ -36,6 +36,17 @@ This app is setup to run ESLint. To run the linter, run the following command:
 npm run lint
 ```
 
+## Database and Environment Variables
+
+This app is using a Redis KV database to store the food truck data. The data is loaded from a CSV file and then stored in Redis. The data is then queried using Redisearch.
+
+To bring in the evironment variables for the database locally, follow these steps.
+
+1. You will need to first be a collaborator on the project.
+2. Install the Vercel CLI `npm i -g vercel@latest`
+3. Link the project `vercel link`
+4. Pull the environment variables `vercel env pull .env.development.local`
+
 ## API
 
 ### Get Food Truck Data
