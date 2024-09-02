@@ -38,7 +38,7 @@ npm run lint
 
 ## Database and Environment Variables
 
-This app is using a Redis KV database to store the food truck data. The data is loaded from a CSV file and then stored in Redis. The data is then queried using Redisearch.
+This app is using a Postgres database to store the food truck data. The data is loaded from a CSV file and then stored in Postgres. The data is then queried using Postgres.
 
 To bring in the evironment variables for the database locally, follow these steps.
 
@@ -46,17 +46,3 @@ To bring in the evironment variables for the database locally, follow these step
 2. Install the Vercel CLI `npm i -g vercel@latest`
 3. Link the project `vercel link`
 4. Pull the environment variables `vercel env pull .env.development.local`
-
-## API
-
-### Get Food Truck Data
-
-`/api/food-trucks`
-
-Returns a list of all food trucks.
-
-### Get Food Truck Data by Food Type
-
-`/api/food-trucks?foodType=pizza`
-
-Include a `foodType` query parameter to filter the food trucks by food type. See `/src/data/food-types.ts` for a list of valid food types.

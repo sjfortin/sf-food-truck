@@ -25,10 +25,10 @@ export function FoodTruckTable({ foodTrucks }: FoodTruckTableProps) {
       <TableBody>
         {foodTrucks.map((truck) => (
           <TableRow key={truck.locationid}>
-            <TableCell className="font-medium">{truck.Applicant}</TableCell>
-            <TableCell>{truck.FoodItems}</TableCell>
+            <TableCell className="font-medium">{truck.applicant}</TableCell>
+            <TableCell>{truck.fooditems}</TableCell>
             <TableCell className="hidden md:table-cell">
-              {truck.LocationDescription}
+              {truck.locationdescription}
             </TableCell>
           </TableRow>
         ))}

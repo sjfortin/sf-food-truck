@@ -8,8 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getFoodTruckData } from "@/utils/getFoodTruckData";
-import { FilterFoodTrucks } from "@/utils/filterFoodTrucks";
+import { FoodTruck } from "@/data/food-truck";
+import { sql } from "@vercel/postgres";
 
 export const dynamic = "force-dynamic";
 
@@ -20,13 +20,19 @@ export default async function Page({
 }) {
   const foodType = searchParams.foodType as string | undefined;
 
-  const allFoodTrucks = await getFoodTruckData();
+  let query = "SELECT * FROM FoodTrucks";
+  let params: any[] = [];
 
-  const filterFoodTrucks = new FilterFoodTrucks(allFoodTrucks);
+  if (foodType) {
+    query += " WHERE FoodItems ILIKE $1";
+    params.push(`%${foodType}%`);
+  }
 
-  const { filteredFoodTrucks, error } = filterFoodTrucks.filterByFoodType(
-    foodType ? [foodType] : null
-  );
+  query += " ORDER BY Applicant ASC";
+
+  const { rows }: { rows: FoodTruck[] } = await sql.query(query, params);
+
+  const foodTrucks: FoodTruck[] = rows;
 
   return (
     <Card>
@@ -40,18 +46,12 @@ export default async function Page({
         <div className="mb-4">
           <FoodTypeSelect selectedFoodType={foodType || null} />
         </div>
-        {error ? (
-          <div>{error}</div>
+        {foodTrucks.length === 0 ? (
+          <div>No food trucks found.</div>
         ) : (
-          <FoodTruckTable foodTrucks={filteredFoodTrucks} />
+          <FoodTruckTable foodTrucks={foodTrucks} />
         )}
       </CardContent>
-      <CardFooter>
-        <div className="text-xs text-muted-foreground">
-          Showing <strong>{filteredFoodTrucks.length}</strong> of{" "}
-          <strong>{allFoodTrucks.length}</strong> food trucks
-        </div>
-      </CardFooter>
     </Card>
   );
 }
