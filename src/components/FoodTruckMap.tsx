@@ -16,6 +16,8 @@ const sanFranciscoCenter = {
   lng: -122.419416,
 };
 
+const defaultZoom = 12;
+
 interface MarkerWithInfoWindowProps {
   truck: FoodTruck;
   isSelected: boolean;
@@ -55,7 +57,7 @@ export function FoodTruckMap() {
   const { foodTrucks, selectedFoodTruck, setSelectedFoodTruck } =
     useFoodTrucks();
   const [mapCenter, setMapCenter] = useState(sanFranciscoCenter);
-  const [mapZoom, setMapZoom] = useState(12);
+  const [mapZoom, setMapZoom] = useState(defaultZoom);
 
   useEffect(() => {
     if (selectedFoodTruck) {
@@ -66,7 +68,7 @@ export function FoodTruckMap() {
       setMapZoom(14);
     } else {
       setMapCenter(sanFranciscoCenter);
-      setMapZoom(12);
+      setMapZoom(defaultZoom);
     }
   }, [selectedFoodTruck]);
 
