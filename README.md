@@ -1,4 +1,4 @@
-# SF Food Truck Finder Web App Project Plan
+# SF Food Truck Finder
 
 ## Project Goal
 
@@ -46,3 +46,18 @@ To bring in the evironment variables for the database locally, follow these step
 2. Install the Vercel CLI `npm i -g vercel@latest`
 3. Link the project `vercel link`
 4. Pull the environment variables `vercel env pull .env.development.local`
+
+Food Truck data is populated from the [https://data.sfgov.org/api/views/rqzj-sfat/rows.csv](https://data.sfgov.org/api/views/rqzj-sfat/rows.csv) API endpoint daily at 11 AM UTC via a cron job.
+
+## Next steps:
+
+### Features to Implement
+
+1. **User Authentication**: Implement user authentication to allow users to save their favorite food trucks.
+2. **Pagination**: Add pagination to the food truck table.
+3. **Current Location**: Add a button to the food truck table to allow users to find food trucks near them.
+4. **Favorite Food Trucks**: Add a page to view the user's favorite food trucks.
+
+### Technical Debt
+
+1. **Testing**: Increase test coverage, especially for critical components and API routes.
