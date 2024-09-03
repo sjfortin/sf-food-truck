@@ -1,14 +1,75 @@
 "use client";
 
+import {
+  AdvancedMarker,
+  APIProvider,
+  Map,
+  InfoWindow,
+  useAdvancedMarkerRef,
+} from "@vis.gl/react-google-maps";
+import { useFoodTrucks } from "@/context/FoodTruckContext";
+import { useEffect, useState } from "react";
 import { FoodTruck } from "@/data/food-truck";
-import { AdvancedMarker, APIProvider, Map } from "@vis.gl/react-google-maps";
 
 const sanFranciscoCenter = {
   lat: 37.7749295,
   lng: -122.419416,
 };
 
-export function FoodTruckMap({ foodTrucks }: { foodTrucks: FoodTruck[] }) {
+interface MarkerWithInfoWindowProps {
+  truck: FoodTruck;
+  isSelected: boolean;
+  onClick: () => void;
+  onClose: () => void;
+}
+
+const MarkerWithInfoWindow = ({
+  truck,
+  isSelected,
+  onClick,
+  onClose,
+}: MarkerWithInfoWindowProps) => {
+  const [markerRef, marker] = useAdvancedMarkerRef();
+
+  return (
+    <>
+      <AdvancedMarker
+        position={{ lat: truck.latitude, lng: truck.longitude }}
+        onClick={onClick}
+        ref={markerRef}
+      />
+      {isSelected && (
+        <InfoWindow anchor={marker} onClose={onClose}>
+          <div>
+            <h3 className="text-lg font-bold">{truck.applicant}</h3>
+            <p className="text-sm">Cuisine: {truck.fooditems}</p>
+            <p className="text-sm">Address: {truck.address}</p>
+          </div>
+        </InfoWindow>
+      )}
+    </>
+  );
+};
+
+export function FoodTruckMap() {
+  const { foodTrucks, selectedFoodTruck, setSelectedFoodTruck } =
+    useFoodTrucks();
+  const [mapCenter, setMapCenter] = useState(sanFranciscoCenter);
+  const [mapZoom, setMapZoom] = useState(12);
+
+  useEffect(() => {
+    if (selectedFoodTruck) {
+      setMapCenter({
+        lat: selectedFoodTruck.latitude,
+        lng: selectedFoodTruck.longitude,
+      });
+      setMapZoom(14);
+    } else {
+      setMapCenter(sanFranciscoCenter);
+      setMapZoom(12);
+    }
+  }, [selectedFoodTruck]);
+
   if (foodTrucks.length === 0) {
     return null;
   }
@@ -20,16 +81,18 @@ export function FoodTruckMap({ foodTrucks }: { foodTrucks: FoodTruck[] }) {
       >
         <Map
           className="w-full h-96 lg:h-[calc(100vh-200px)]"
-          defaultCenter={sanFranciscoCenter}
-          defaultZoom={12}
+          defaultCenter={mapCenter}
+          defaultZoom={mapZoom}
           gestureHandling={"greedy"}
-          disableDefaultUI={true}
           mapId="food-truck-map"
         >
           {foodTrucks.map((truck) => (
-            <AdvancedMarker
+            <MarkerWithInfoWindow
               key={truck.locationid}
-              position={{ lat: truck.latitude, lng: truck.longitude }}
+              truck={truck}
+              isSelected={selectedFoodTruck?.locationid === truck.locationid}
+              onClick={() => setSelectedFoodTruck(truck)}
+              onClose={() => setSelectedFoodTruck(null)}
             />
           ))}
         </Map>
