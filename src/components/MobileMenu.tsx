@@ -34,14 +34,6 @@ export function MobileMenu() {
             <Home className="h-5 w-5" />
             Home
           </Button>
-          <Button
-            variant="ghost"
-            className="flex items-center justify-start gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-            onClick={() => handleNavigation("/food-trucks")}
-          >
-            <Utensils className="h-5 w-5" />
-            Food Trucks
-          </Button>
         </nav>
       </SheetContent>
     </Sheet>
