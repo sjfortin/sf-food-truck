@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Table,
   TableBody,
@@ -6,27 +8,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FoodTruck } from "@/data/food-truck";
+import { useFoodTrucks } from "@/context/FoodTruckContext";
 
-interface FoodTruckTableProps {
-  foodTrucks: FoodTruck[];
-}
+export function FoodTruckTable() {
+  const { foodTrucks, setSelectedFoodTruck } = useFoodTrucks();
 
-export function FoodTruckTable({ foodTrucks }: FoodTruckTableProps) {
   return (
     <div>
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
-            <TableHead>Cuisine</TableHead>
+            <TableHead>Address</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {foodTrucks.map((truck) => (
-            <TableRow key={truck.locationid}>
+            <TableRow
+              key={truck.locationid}
+              onClick={() => setSelectedFoodTruck(truck)}
+              className="cursor-pointer hover:bg-gray-100"
+            >
               <TableCell className="font-medium">{truck.applicant}</TableCell>
-              <TableCell>{truck.fooditems}</TableCell>
+              <TableCell>{truck.address}</TableCell>
             </TableRow>
           ))}
         </TableBody>
