@@ -32,9 +32,9 @@ export function FoodTypeSelect({ selectedFoodType }: FoodTypeSelectProps) {
     const newValue = selectedFoodType === value ? null : value;
     setOpen(false);
     if (newValue) {
-      router.push(`/food-trucks?foodType=${encodeURIComponent(newValue)}`);
+      router.push(`/?foodType=${encodeURIComponent(newValue)}`);
     } else {
-      router.push("/food-trucks");
+      router.push("/");
     }
   };
 
