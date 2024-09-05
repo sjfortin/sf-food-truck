@@ -4,9 +4,9 @@ import Papa from "papaparse";
 import { FoodTruck } from "@/data/food-truck";
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
+  const authHeader = request.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response('Unauthorized', {
+    return new Response("Unauthorized", {
       status: 401,
     });
   }
@@ -14,32 +14,6 @@ export async function GET(request: NextRequest) {
   const url = "https://data.sfgov.org/api/views/rqzj-sfat/rows.csv";
 
   try {
-    await sql`DROP TABLE IF EXISTS foodtrucks`;
-
-    await sql`
-      CREATE TABLE foodtrucks (
-        locationid INT PRIMARY KEY,
-        applicant TEXT,
-        facilitytype TEXT,
-        locationdescription TEXT,
-        address TEXT,
-        permit TEXT,
-        status TEXT,
-        fooditems TEXT,
-        latitude FLOAT,
-        longitude FLOAT,
-        schedule TEXT,
-        dayshours TEXT,
-        expirationdate TEXT,
-        location TEXT,
-        firepreventiondistricts TEXT,
-        policedistricts TEXT,
-        supervisordistricts TEXT,
-        zipcodes TEXT,
-        neighborhoods TEXT
-      )
-    `;
-
     const response = await fetch(url);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -89,19 +63,66 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    // Insert all records
+    let totalUpdated = 0;
+
+    // Upsert all food truck records
     for (const truck of Object.values(foodTrucks)) {
-      await sql`
-        INSERT INTO FoodTrucks (
-          locationid, applicant, facilitytype, locationdescription, address, permit, status, fooditems, latitude, longitude, schedule, dayshours, expirationdate, location, firepreventiondistricts, policedistricts, supervisordistricts, zipcodes, neighborhoods
-        ) VALUES (
-          ${truck.locationid}, ${truck.applicant}, ${truck.facilitytype}, ${truck.locationdescription}, ${truck.address}, ${truck.permit}, ${truck.status}, ${truck.fooditems}, ${truck.latitude}, ${truck.longitude}, ${truck.schedule}, ${truck.dayshours}, ${truck.expirationdate}, ${truck.location}, ${truck.firepreventiondistricts}, ${truck.policedistricts}, ${truck.supervisordistricts}, ${truck.zipcodes}, ${truck.neighborhoods}
+      const result = await sql`
+        WITH updated_rows AS (
+          INSERT INTO FoodTrucks (
+            locationid, applicant, facilitytype, locationdescription, address, permit, status, fooditems, latitude, longitude, schedule, dayshours, expirationdate, location, firepreventiondistricts, policedistricts, supervisordistricts, zipcodes, neighborhoods
+          ) VALUES (
+            ${truck.locationid}, ${truck.applicant}, ${truck.facilitytype}, ${truck.locationdescription}, ${truck.address}, ${truck.permit}, ${truck.status}, ${truck.fooditems}, ${truck.latitude}, ${truck.longitude}, ${truck.schedule}, ${truck.dayshours}, ${truck.expirationdate}, ${truck.location}, ${truck.firepreventiondistricts}, ${truck.policedistricts}, ${truck.supervisordistricts}, ${truck.zipcodes}, ${truck.neighborhoods}
+          )
+          ON CONFLICT (locationid)
+          DO UPDATE SET
+            applicant = EXCLUDED.applicant,
+            facilitytype = EXCLUDED.facilitytype,
+            locationdescription = EXCLUDED.locationdescription,
+            address = EXCLUDED.address,
+            permit = EXCLUDED.permit,
+            status = EXCLUDED.status,
+            fooditems = EXCLUDED.fooditems,
+            latitude = EXCLUDED.latitude,
+            longitude = EXCLUDED.longitude,
+            schedule = EXCLUDED.schedule,
+            dayshours = EXCLUDED.dayshours,
+            expirationdate = EXCLUDED.expirationdate,
+            location = EXCLUDED.location,
+            firepreventiondistricts = EXCLUDED.firepreventiondistricts,
+            policedistricts = EXCLUDED.policedistricts,
+            supervisordistricts = EXCLUDED.supervisordistricts,
+            zipcodes = EXCLUDED.zipcodes,
+            neighborhoods = EXCLUDED.neighborhoods
+          WHERE 
+            FoodTrucks.applicant != EXCLUDED.applicant OR
+            FoodTrucks.facilitytype != EXCLUDED.facilitytype OR
+            FoodTrucks.locationdescription != EXCLUDED.locationdescription OR
+            FoodTrucks.address != EXCLUDED.address OR
+            FoodTrucks.permit != EXCLUDED.permit OR
+            FoodTrucks.status != EXCLUDED.status OR
+            FoodTrucks.fooditems != EXCLUDED.fooditems OR
+            FoodTrucks.latitude != EXCLUDED.latitude OR
+            FoodTrucks.longitude != EXCLUDED.longitude OR
+            FoodTrucks.schedule != EXCLUDED.schedule OR
+            FoodTrucks.dayshours != EXCLUDED.dayshours OR
+            FoodTrucks.expirationdate != EXCLUDED.expirationdate OR
+            FoodTrucks.location != EXCLUDED.location OR
+            FoodTrucks.firepreventiondistricts != EXCLUDED.firepreventiondistricts OR
+            FoodTrucks.policedistricts != EXCLUDED.policedistricts OR
+            FoodTrucks.supervisordistricts != EXCLUDED.supervisordistricts OR
+            FoodTrucks.zipcodes != EXCLUDED.zipcodes OR
+            FoodTrucks.neighborhoods != EXCLUDED.neighborhoods
+          RETURNING *
         )
+        SELECT COUNT(*) FROM updated_rows
       `;
+
+      totalUpdated += Number(result.rows[0].count);
     }
 
     return NextResponse.json({
-      message: "Food truck data has been refreshed in PostgreSQL",
+      message: `Food truck data has been refreshed in PostgreSQL. ${totalUpdated} records were inserted or updated.`,
     });
   } catch (error) {
     console.error("Error refreshing PostgreSQL data:", error);
